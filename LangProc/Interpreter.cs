@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 namespace LangProc
 {
@@ -20,45 +21,16 @@ namespace LangProc
             using (var tokenEnum = tokens.GetEnumerator())
             {
                 tokenEnum.MoveNext();
-
                 ValidateType(tokenEnum.Current, TokenType.Integer);
-
                 int left = (int) tokenEnum.Current.Value;
 
-                // Handle additional digits
-                while (true)
-                {
-                    tokenEnum.MoveNext();
-                    if (tokenEnum.Current.Type == TokenType.Integer)
-                    {
-                        int temp = (int) tokenEnum.Current.Value;
-
-                        left = (left * 10) + temp;
-                    }
-                    else break;
-                }
-
+                tokenEnum.MoveNext();
                 ValidateType(tokenEnum.Current, OperatorTypes);
-
                 var operatorToken = tokenEnum.Current;
 
                 tokenEnum.MoveNext();
-
                 ValidateType(tokenEnum.Current, TokenType.Integer);
-
                 int right = (int) tokenEnum.Current.Value;
-
-                while (true)
-                {
-                    tokenEnum.MoveNext();
-                    if (tokenEnum.Current.Type == TokenType.Integer)
-                    {
-                        int temp = (int) tokenEnum.Current.Value;
-
-                        right = (right * 10) + temp;
-                    }
-                    else break;
-                }
 
                 if (operatorToken.Type == TokenType.Add)
                     return left + right;
@@ -83,8 +55,18 @@ namespace LangProc
         /// <returns>Token enumerable</returns>
         private static IEnumerable<Token> GetTokens(string text)
         {
-            foreach (var value in text)
+            StringBuilder intBuilder = null;
+
+            foreach (char value in text)
             {
+                // Finish tokenizing a pending integer
+                // Before whitespace check so nonsense like 123 456 is not interpreted as a single number
+                if (intBuilder != null && !char.IsDigit(value))
+                {
+                    yield return new Token(TokenType.Integer, int.Parse(intBuilder.ToString()));
+                    intBuilder = null;
+                }
+
                 if (char.IsWhiteSpace(value)) continue;
 
                 if (Token.TryParseOperator(value, out var token))
@@ -93,15 +75,18 @@ namespace LangProc
                 }
                 else if (char.IsDigit(value))
                 {
-                    // Python Example
-                    //def integer(self):
-                    //"""Return a (multidigit) integer consumed from the input."""
-                    //result = ''
-                    //while self.current_char is not None and self.current_char.isdigit():
-                    //result += self.current_char
-                    //self.advance()
-                    //return int(result)
+                    // Append to pending integer builder
+                    if (intBuilder == null)
+                        intBuilder = new StringBuilder(value.ToString());
+                    else
+                        intBuilder.Append(value);
                 }
+            }
+
+            // Finish tokenizing a pending integer
+            if (intBuilder != null)
+            {
+                yield return new Token(TokenType.Integer, int.Parse(intBuilder.ToString()));
             }
 
             yield return new Token(TokenType.EndOfFile);
