@@ -86,7 +86,22 @@ namespace LangProc
             foreach (var value in text)
             {
                 if (char.IsWhiteSpace(value)) continue;
-                yield return Token.Parse(value);
+
+                if (Token.TryParseOperator(value, out var token))
+                {
+                    yield return token;
+                }
+                else if (char.IsDigit(value))
+                {
+                    // Python Example
+                    //def integer(self):
+                    //"""Return a (multidigit) integer consumed from the input."""
+                    //result = ''
+                    //while self.current_char is not None and self.current_char.isdigit():
+                    //result += self.current_char
+                    //self.advance()
+                    //return int(result)
+                }
             }
 
             yield return new Token(TokenType.EndOfFile);
