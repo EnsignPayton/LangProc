@@ -12,40 +12,62 @@ namespace LangProc
         };
 
         /// <summary>
-        /// Parses an expression of the form "INTEGER OPERATOR INTEGER"
+        /// Parses an expression.
         /// </summary>
         public static int ParseExpression(string text)
         {
             var tokens = GetTokens(text);
+            var tokenQueue = new Queue<Token>();
 
             using (var tokenEnum = tokens.GetEnumerator())
             {
+                // First should be an integer type
                 tokenEnum.MoveNext();
                 ValidateType(tokenEnum.Current, TokenType.Integer);
-                int left = (int) tokenEnum.Current.Value;
+                tokenQueue.Enqueue(tokenEnum.Current);
 
+                // Now, we can alternate operators and integers
                 tokenEnum.MoveNext();
-                ValidateType(tokenEnum.Current, OperatorTypes);
-                var operatorToken = tokenEnum.Current;
+                while (tokenEnum.Current.Type != TokenType.EndOfFile)
+                {
+                    ValidateType(tokenEnum.Current, OperatorTypes);
+                    tokenQueue.Enqueue(tokenEnum.Current);
 
-                tokenEnum.MoveNext();
-                ValidateType(tokenEnum.Current, TokenType.Integer);
-                int right = (int) tokenEnum.Current.Value;
+                    tokenEnum.MoveNext();
+                    ValidateType(tokenEnum.Current, TokenType.Integer);
+                    tokenQueue.Enqueue(tokenEnum.Current);
 
-                if (operatorToken.Type == TokenType.Add)
-                    return left + right;
+                    tokenEnum.MoveNext();
+                }
 
-                if (operatorToken.Type == TokenType.Sub)
-                    return left - right;
-
-                if (operatorToken.Type == TokenType.Mult)
-                    return left * right;
-
-                if (operatorToken.Type == TokenType.Div)
-                    return left / right;
-
-                throw new Exception("Invalid operator. This should not happen.");
+                // Error on unknowns
+                ValidateType(tokenEnum.Current, TokenType.EndOfFile);
             }
+
+            int result = (int) tokenQueue.Dequeue().Value;
+            while (tokenQueue.Count != 0)
+            {
+                TokenType opType = tokenQueue.Dequeue().Type;
+                int rhs = (int) tokenQueue.Dequeue().Value;
+
+                switch (opType)
+                {
+                    case TokenType.Add:
+                        result += rhs;
+                        break;
+                    case TokenType.Sub:
+                        result -= rhs;
+                        break;
+                    case TokenType.Mult:
+                        result *= rhs;
+                        break;
+                    case TokenType.Div:
+                        result /= rhs;
+                        break;
+                }
+            }
+
+            return result;
         }
 
         /// <summary>
@@ -80,6 +102,10 @@ namespace LangProc
                         intBuilder = new StringBuilder(value.ToString());
                     else
                         intBuilder.Append(value);
+                }
+                else
+                {
+                    yield return new Token(TokenType.Unknown, value);
                 }
             }
 
