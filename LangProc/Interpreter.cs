@@ -5,8 +5,13 @@ namespace LangProc
 {
     internal static class Interpreter
     {
+        private static readonly ICollection<TokenType> OperatorTypes = new List<TokenType>
+        {
+            TokenType.Add, TokenType.Sub, TokenType.Mult, TokenType.Div
+        };
+
         /// <summary>
-        /// Parses an expression of the form "INTEGER PLUS INTEGER"
+        /// Parses an expression of the form "INTEGER OPERATOR INTEGER"
         /// </summary>
         public static int ParseExpression(string text)
         {
@@ -18,19 +23,56 @@ namespace LangProc
 
                 ValidateType(tokenEnum.Current, TokenType.Integer);
 
-                var left =  (int) tokenEnum.Current.Value;
+                int left = (int) tokenEnum.Current.Value;
 
-                tokenEnum.MoveNext();
+                // Handle additional digits
+                while (true)
+                {
+                    tokenEnum.MoveNext();
+                    if (tokenEnum.Current.Type == TokenType.Integer)
+                    {
+                        int temp = (int) tokenEnum.Current.Value;
 
-                ValidateType(tokenEnum.Current, TokenType.Plus);
+                        left = (left * 10) + temp;
+                    }
+                    else break;
+                }
+
+                ValidateType(tokenEnum.Current, OperatorTypes);
+
+                var operatorToken = tokenEnum.Current;
 
                 tokenEnum.MoveNext();
 
                 ValidateType(tokenEnum.Current, TokenType.Integer);
 
-                var right = (int) tokenEnum.Current.Value;
+                int right = (int) tokenEnum.Current.Value;
 
-                return left + right;
+                while (true)
+                {
+                    tokenEnum.MoveNext();
+                    if (tokenEnum.Current.Type == TokenType.Integer)
+                    {
+                        int temp = (int) tokenEnum.Current.Value;
+
+                        right = (right * 10) + temp;
+                    }
+                    else break;
+                }
+
+                if (operatorToken.Type == TokenType.Add)
+                    return left + right;
+
+                if (operatorToken.Type == TokenType.Sub)
+                    return left - right;
+
+                if (operatorToken.Type == TokenType.Mult)
+                    return left * right;
+
+                if (operatorToken.Type == TokenType.Div)
+                    return left / right;
+
+                throw new Exception("Invalid operator. This should not happen.");
             }
         }
 
@@ -43,6 +85,7 @@ namespace LangProc
         {
             foreach (var value in text)
             {
+                if (char.IsWhiteSpace(value)) continue;
                 yield return Token.Parse(value);
             }
 
@@ -53,6 +96,12 @@ namespace LangProc
         {
             if (token.Type != expected)
                 throw new Exception($"Expected token type {expected} but found {token.Type}");
+        }
+
+        private static void ValidateType(Token token, ICollection<TokenType> expectedTypes)
+        {
+            if (!expectedTypes.Contains(token.Type))
+                throw new Exception($"Token type {token.Type} was not expected.");
         }
     }
 }

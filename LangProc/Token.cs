@@ -13,12 +13,21 @@
 
         public static Token Parse(char value)
         {
+            // Data
             if (char.IsDigit(value))
                 return new Token(TokenType.Integer, (int) char.GetNumericValue(value));
 
+            // Operators
             if (value == '+')
-                return new Token(TokenType.Plus, value);
+                return new Token(TokenType.Add, value);
+            if (value == '-')
+                return new Token(TokenType.Sub, value);
+            if (value == '*')
+                return new Token(TokenType.Mult, value);
+            if (value == '/')
+                return new Token(TokenType.Div, value);
 
+            // Other
             return new Token(TokenType.Unknown, value);
         }
 
