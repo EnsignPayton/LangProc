@@ -11,8 +11,7 @@ namespace LangProc
                 try
                 {
                     var text = Console.ReadLine();
-                    var interpreter = new Interpreter(text);
-                    var result = interpreter.ParseExpression();
+                    var result = Interpreter.ParseExpression(text);
                     Console.WriteLine(result);
                 }
                 catch (Exception ex)

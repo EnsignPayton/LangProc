@@ -4,6 +4,7 @@
     {
         Integer,
         Plus,
-        EndOfFile
+        EndOfFile,
+        Unknown
     }
 }

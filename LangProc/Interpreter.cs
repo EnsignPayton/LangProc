@@ -1,79 +1,58 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace LangProc
 {
-    internal class Interpreter
+    internal static class Interpreter
     {
-        private string _text;
-        private int _position;
-        private Token _currentToken;
-
-        public Interpreter(string text)
-        {
-            _text = text;
-        }
-
-        /// <summary>
-        /// Lexical Analyzer / Scanner / Tokenizer
-        /// </summary>
-        public Token GetNextToken()
-        {
-            string text = _text;
-
-            // No more input left
-            if (_position > text.Length - 1)
-                return new Token(TokenType.EndOfFile, null);
-
-            char currentChar = text[_position];
-
-            if (char.IsDigit(currentChar))
-            {
-                _position++;
-                return new Token(TokenType.Integer, (int) char.GetNumericValue(currentChar));
-            }
-
-            if (currentChar == '+')
-            {
-                _position++;
-                return new Token(TokenType.Plus, currentChar);
-            }
-
-            throw new Exception($"Error parsing input: '{currentChar}' not recognized as a valid token.");
-        }
-
-        /// <summary>
-        /// Consumes and validates the next token
-        /// </summary>
-        public void Eat(TokenType type)
-        {
-            if (_currentToken.Type == type)
-                _currentToken = GetNextToken();
-            else
-                throw new Exception($"Expected token of type {type} but found token of type {_currentToken.Type}.");
-        }
-
         /// <summary>
         /// Parses an expression of the form "INTEGER PLUS INTEGER"
         /// </summary>
-        public int ParseExpression()
+        public static int ParseExpression(string text)
         {
-            _currentToken = GetNextToken();
+            var tokens = GetTokens(text);
 
-            var left = _currentToken;
-            Eat(TokenType.Integer);
+            using (var tokenEnum = tokens.GetEnumerator())
+            {
+                tokenEnum.MoveNext();
 
-            Eat(TokenType.Plus);
+                ValidateType(tokenEnum.Current, TokenType.Integer);
 
-            var right = _currentToken;
-            Eat(TokenType.Integer);
+                var left =  (int) tokenEnum.Current.Value;
 
-            // We ignore the rest. To error instead, Eat an EOF here.
+                tokenEnum.MoveNext();
 
-            return (int)left.Value + (int)right.Value;
+                ValidateType(tokenEnum.Current, TokenType.Plus);
+
+                tokenEnum.MoveNext();
+
+                ValidateType(tokenEnum.Current, TokenType.Integer);
+
+                var right = (int) tokenEnum.Current.Value;
+
+                return left + right;
+            }
+        }
+
+        /// <summary>
+        /// Tokenize an expression string
+        /// </summary>
+        /// <param name="text">Expression</param>
+        /// <returns>Token enumerable</returns>
+        private static IEnumerable<Token> GetTokens(string text)
+        {
+            foreach (var value in text)
+            {
+                yield return Token.Parse(value);
+            }
+
+            yield return new Token(TokenType.EndOfFile);
+        }
+
+        private static void ValidateType(Token token, TokenType expected)
+        {
+            if (token.Type != expected)
+                throw new Exception($"Expected token type {expected} but found {token.Type}");
         }
     }
 }
