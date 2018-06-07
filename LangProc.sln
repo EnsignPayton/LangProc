@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangProc", "LangProc\LangPr
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangProc.Core", "LangProc.Core\LangProc.Core.csproj", "{495BC7AE-1847-4E4A-B255-7E54296B3EC6}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangProc.Test", "LangProc.Test\LangProc.Test.csproj", "{433302C9-6BDA-4FC6-AB53-D58F1F7DAEF6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Release|Any CPU.Build.0 = Release|Any CPU
+		{433302C9-6BDA-4FC6-AB53-D58F1F7DAEF6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{433302C9-6BDA-4FC6-AB53-D58F1F7DAEF6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{433302C9-6BDA-4FC6-AB53-D58F1F7DAEF6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{433302C9-6BDA-4FC6-AB53-D58F1F7DAEF6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
