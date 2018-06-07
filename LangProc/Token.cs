@@ -36,17 +36,6 @@ namespace LangProc
 
         #region Static Parsing
 
-        public static Token Parse(char value)
-        {
-            if (char.IsDigit(value))
-                return new Token(TokenType.Integer, (int) char.GetNumericValue(value));
-
-            if (TryParseOperator(value, out var token))
-                return token;
-
-            return new Token(TokenType.Unknown, value);
-        }
-
         public static Token ParseOperator(char value)
         {
             return new Token(OperatorTypes[value], value);
