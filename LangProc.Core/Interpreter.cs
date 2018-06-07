@@ -1,6 +1,6 @@
-﻿namespace LangProc
+﻿namespace LangProc.Core
 {
-    internal static class Interpreter
+    public static class Interpreter
     {
         /// <summary>
         /// Parses an expression.

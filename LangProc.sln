@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.27428.2037
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangProc", "LangProc\LangProc.csproj", "{39BFDBC4-844E-401D-ABEA-F57498418FAE}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangProc.Core", "LangProc.Core\LangProc.Core.csproj", "{495BC7AE-1847-4E4A-B255-7E54296B3EC6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{39BFDBC4-844E-401D-ABEA-F57498418FAE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{39BFDBC4-844E-401D-ABEA-F57498418FAE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{39BFDBC4-844E-401D-ABEA-F57498418FAE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{495BC7AE-1847-4E4A-B255-7E54296B3EC6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

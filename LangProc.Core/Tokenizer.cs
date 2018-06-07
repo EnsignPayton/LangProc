@@ -2,9 +2,9 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace LangProc
+namespace LangProc.Core
 {
-    internal static class Tokenizer
+    public static class Tokenizer
     {
         /// <summary>
         /// Tokenize an expression string

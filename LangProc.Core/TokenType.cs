@@ -1,6 +1,6 @@
-﻿namespace LangProc
+﻿namespace LangProc.Core
 {
-    internal enum TokenType
+    public enum TokenType
     {
         // Data Types
         Integer,

@@ -1,9 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace LangProc
+namespace LangProc.Core
 {
-    internal class Parser : IDisposable
+    public class Parser : IDisposable
     {
         private IEnumerator<Token> _enumerator;
 

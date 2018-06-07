@@ -1,8 +1,8 @@
 ﻿using System.Collections.Generic;
 
-namespace LangProc
+namespace LangProc.Core
 {
-    internal class Token
+    public class Token
     {
         #region Static Lookups
 

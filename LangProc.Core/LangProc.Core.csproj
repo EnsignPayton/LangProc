@@ -4,16 +4,15 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{39BFDBC4-844E-401D-ABEA-F57498418FAE}</ProjectGuid>
-    <OutputType>Exe</OutputType>
-    <RootNamespace>LangProc</RootNamespace>
-    <AssemblyName>LangProc</AssemblyName>
+    <ProjectGuid>{495BC7AE-1847-4E4A-B255-7E54296B3EC6}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>LangProc.Core</RootNamespace>
+    <AssemblyName>LangProc.Core</AssemblyName>
     <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
-    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,7 +22,6 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -42,17 +40,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Program.cs" />
+    <Compile Include="Interpreter.cs" />
+    <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\LangProc.Core\LangProc.Core.csproj">
-      <Project>{495bc7ae-1847-4e4a-b255-7e54296b3ec6}</Project>
-      <Name>LangProc.Core</Name>
-    </ProjectReference>
+    <Compile Include="Token.cs" />
+    <Compile Include="Tokenizer.cs" />
+    <Compile Include="TokenType.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
