@@ -32,6 +32,14 @@ namespace LangProc.Core
                 {
                     yield return token;
                 }
+                else if (value =='(')
+                {
+                    yield return new Token(TokenType.ParenOpen, value);
+                }
+                else if (value == ')')
+                {
+                    yield return new Token(TokenType.ParenClose, value);
+                }
                 else if (char.IsDigit(value))
                 {
                     // Append to pending integer builder

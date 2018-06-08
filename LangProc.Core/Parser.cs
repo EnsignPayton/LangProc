@@ -29,14 +29,18 @@ namespace LangProc.Core
             // Terminals -> Tokens
             //
             // G = ( { Expression, Term, Factor },
-            //       { Add, Sub, Mult, Div, Integer },
+            //       { Add, Sub, Mult, Div, Integer, ParenOpen, ParenClose, EndOfFile },
             //       Expression, P )
             //
-            // Expression -> Term ( ( Add | Sub ) Term )*
+            // Expression -> Term ( ( Add | Sub ) Term )* EndOfFile
             // Term -> Factor ( ( Mult | Div ) Factor )*
-            // Factor -> Integer
+            // Factor -> Integer | ParenOpen Expression ParenClose
 
-            return ParseExpression();
+            int result =  ParseExpression();
+
+            ValidateType(_enumerator.Current, TokenType.EndOfFile);
+
+            return result;
         }
 
         // Expression -> Term ( ( Add | Sub ) Term )*
@@ -79,13 +83,27 @@ namespace LangProc.Core
             return result;
         }
 
-        // Factor -> Integer
+        // Factor -> Integer | ParenOpen Expression ParenClose
         private int ParseFactor()
         {
-            var token = _enumerator.Current;
-            ValidateType(token, TokenType.Integer);
-            _enumerator.MoveNext();
-            return (int) token.Value;
+            if (_enumerator.Current.Type == TokenType.Integer)
+            {
+                var token = _enumerator.Current;
+                _enumerator.MoveNext();
+                return (int)token.Value;
+            }
+            else
+            {
+                ValidateType(_enumerator.Current, TokenType.ParenOpen);
+                _enumerator.MoveNext();
+
+                var result = ParseExpression();
+
+                ValidateType(_enumerator.Current, TokenType.ParenClose);
+                _enumerator.MoveNext();
+
+                return result;
+            }
         }
 
         private static void ValidateType(Token token, params TokenType[] expectedTypes)

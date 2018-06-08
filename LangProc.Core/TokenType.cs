@@ -2,14 +2,13 @@
 {
     public enum TokenType
     {
-        // Data Types
         Integer,
-        // Operator Types
+        ParenOpen,
+        ParenClose,
         Add,
         Sub,
         Mult,
         Div,
-        // Other
         EndOfFile,
         Unknown
     }
