@@ -22,7 +22,7 @@ namespace LangProc.Core
             }
         }
 
-        public int Parse()
+        public TreeNode<Token> Parse()
         {
             // Grammar directly translates to parser
             // Variables -> Functions
@@ -32,11 +32,11 @@ namespace LangProc.Core
             //       { Add, Sub, Mult, Div, Integer, ParenOpen, ParenClose, EndOfFile },
             //       Expression, P )
             //
-            // Expression -> Term ( ( Add | Sub ) Term )* EndOfFile
+            // Expression -> Term ( ( Add | Sub ) Term )*
             // Term -> Factor ( ( Mult | Div ) Factor )*
             // Factor -> Integer | ParenOpen Expression ParenClose
 
-            int result =  ParseExpression();
+            var result =  ParseExpression();
 
             ValidateType(_enumerator.Current, TokenType.EndOfFile);
 
@@ -44,9 +44,9 @@ namespace LangProc.Core
         }
 
         // Expression -> Term ( ( Add | Sub ) Term )*
-        private int ParseExpression()
+        private TreeNode<Token> ParseExpression()
         {
-            int result = ParseTerm();
+            var result = ParseTerm();
 
             var ops = new List<TokenType> {TokenType.Add, TokenType.Sub};
             while (ops.Contains(_enumerator.Current.Type))
@@ -54,19 +54,16 @@ namespace LangProc.Core
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
 
-                if (token.Type == TokenType.Add)
-                    result += ParseTerm();
-                else if (token.Type == TokenType.Sub)
-                    result -= ParseTerm();
+                result = new TreeNode<Token>(token, result, ParseTerm());
             }
 
             return result;
         }
 
         // Term -> Factor ( ( Mult | Div ) Factor )*
-        private int ParseTerm()
+        private TreeNode<Token> ParseTerm()
         {
-            int result = ParseFactor();
+            var result = ParseFactor();
 
             var ops = new List<TokenType> {TokenType.Mult, TokenType.Div};
             while (ops.Contains(_enumerator.Current.Type))
@@ -74,23 +71,20 @@ namespace LangProc.Core
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
 
-                if (token.Type == TokenType.Mult)
-                    result *= ParseFactor();
-                else if (token.Type == TokenType.Div)
-                    result /= ParseFactor();
+                result = new TreeNode<Token>(token, result, ParseFactor());
             }
 
             return result;
         }
 
         // Factor -> Integer | ParenOpen Expression ParenClose
-        private int ParseFactor()
+        private TreeNode<Token> ParseFactor()
         {
             if (_enumerator.Current.Type == TokenType.Integer)
             {
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
-                return (int)token.Value;
+                return new TreeNode<Token>(token);
             }
             else
             {

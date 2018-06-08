@@ -6,86 +6,6 @@ namespace LangProc.Test
 {
     public class ParserTests
     {
-        #region Basic Operations
-
-        [Test]
-        public void Adds()
-        {
-            var tokens = new[]
-            {
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.Add),
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.EndOfFile)
-            };
-
-            using (var parser = new Parser(tokens))
-            {
-                var result = parser.Parse();
-
-                Assert.AreEqual(result, 2);
-            }
-        }
-
-        [Test]
-        public void Subtracts()
-        {
-            var tokens = new[]
-            {
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.Sub),
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.EndOfFile)
-            };
-
-            using (var parser = new Parser(tokens))
-            {
-                var result = parser.Parse();
-
-                Assert.AreEqual(result, 0);
-            }
-        }
-
-        [Test]
-        public void Multiplies()
-        {
-            var tokens = new[]
-            {
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.Mult),
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.EndOfFile)
-            };
-
-            using (var parser = new Parser(tokens))
-            {
-                var result = parser.Parse();
-
-                Assert.AreEqual(result, 1);
-            }
-        }
-
-        [Test]
-        public void Divides()
-        {
-            var tokens = new[]
-            {
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.Div),
-                new Token(TokenType.Integer, 1),
-                new Token(TokenType.EndOfFile)
-            };
-
-            using (var parser = new Parser(tokens))
-            {
-                var result = parser.Parse();
-
-                Assert.AreEqual(result, 1);
-            }
-        }
-
-        #endregion
-
         #region Order Of Operations
 
         [Test]
@@ -105,7 +25,7 @@ namespace LangProc.Test
             {
                 var result = parser.Parse();
 
-                Assert.AreEqual(result, 7);
+                Assert.That(result.Data.Type, Is.EqualTo(TokenType.Add));
             }
         }
 
@@ -128,7 +48,7 @@ namespace LangProc.Test
             {
                 var result = parser.Parse();
 
-                Assert.AreEqual(result, 9);
+                Assert.That(result.Data.Type, Is.EqualTo(TokenType.Mult));
             }
         }
 

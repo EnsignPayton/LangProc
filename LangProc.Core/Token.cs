@@ -27,11 +27,6 @@ namespace LangProc.Core
         public TokenType Type { get; set; }
         public object Value { get; set; }
 
-        public override string ToString()
-        {
-            return $"Token({Type}, {Value}";
-        }
-
         #endregion
 
         #region Static Parsing
