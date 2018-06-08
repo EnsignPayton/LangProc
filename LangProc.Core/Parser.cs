@@ -109,7 +109,7 @@ namespace LangProc.Core
         private static void ValidateType(Token token, params TokenType[] expectedTypes)
         {
             if (!((IList<TokenType>)expectedTypes).Contains(token.Type))
-                throw new Exception($"Token type {token.Type} was not expected.");
+                throw new InvalidOperationException($"Token type {token.Type} was not expected.");
         }
     }
 }
