@@ -12,9 +12,9 @@ namespace LangProc.Core
             RightChild = rightChild;
         }
 
-        public T Data { get; set; }
-        public TreeNode<T> LeftChild { get; set; }
-        public TreeNode<T> RightChild { get; set; }
+        public T Data { get; }
+        public TreeNode<T> LeftChild { get; }
+        public TreeNode<T> RightChild { get; }
 
         public IEnumerator<T> GetEnumerator()
         {

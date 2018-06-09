@@ -54,6 +54,46 @@ namespace LangProc.Test
 
         #endregion
 
+        #region Unary Operations
+
+        [Test]
+        public void UnaryPlus()
+        {
+            var tokens = new[]
+            {
+                new Token(TokenType.Add),
+                new Token(TokenType.Integer, 1),
+                new Token(TokenType.EndOfFile)
+            };
+
+            using (var parser = new Parser(tokens))
+            {
+                var result = parser.Parse();
+
+                Assert.That(result.IsUnary);
+            }
+        }
+
+        [Test]
+        public void UnaryMinus()
+        {
+            var tokens = new[]
+            {
+                new Token(TokenType.Sub),
+                new Token(TokenType.Integer, 1),
+                new Token(TokenType.EndOfFile)
+            };
+
+            using (var parser = new Parser(tokens))
+            {
+                var result = parser.Parse();
+
+                Assert.That(result.IsUnary);
+            }
+        }
+
+        #endregion
+
         #region Error Handling
 
         [Test]

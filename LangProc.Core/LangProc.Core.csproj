@@ -45,6 +45,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
+    <Compile Include="TokenNode.cs" />
     <Compile Include="TokenType.cs" />
     <Compile Include="TreeNode.cs" />
   </ItemGroup>

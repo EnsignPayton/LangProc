@@ -24,8 +24,8 @@ namespace LangProc.Core
             Value = value;
         }
 
-        public TokenType Type { get; set; }
-        public object Value { get; set; }
+        public TokenType Type { get; }
+        public object Value { get; }
 
         #endregion
 

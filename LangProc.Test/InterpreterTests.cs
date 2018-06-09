@@ -49,13 +49,59 @@ namespace LangProc.Test
 
         #endregion
 
+        #region Unary Operations
+
+        [Test]
+        public void UnaryNegation()
+        {
+            // -1
+            var tree = new TokenNode(new Token(TokenType.Sub),
+                new TokenNode(new Token(TokenType.Integer, 1))) {IsUnary = true};
+            int result = Interpreter.Crawl(tree);
+
+            Assert.That(result, Is.EqualTo(-1));
+        }
+
+        [Test]
+        public void UnaryDoublePositive()
+        {
+            // +(+1)
+            var tree = BuildUnaryTree(TokenType.Add);
+            int result = Interpreter.Crawl(tree);
+
+            Assert.That(result, Is.EqualTo(1));
+        }
+
+        [Test]
+        public void UnaryDoubleNegative()
+        {
+            // -(-1)
+            var tree = BuildUnaryTree(TokenType.Sub);
+            int result = Interpreter.Crawl(tree);
+
+            Assert.That(result, Is.EqualTo(1));
+        }
+
+        #endregion
+
         #region Helpers
 
-        private static TreeNode<Token> BuildBasicTree(TokenType operation)
+        private static TokenNode BuildBasicTree(TokenType operation)
         {
-            var tree = new TreeNode<Token>(new Token(operation),
-                new TreeNode<Token>(new Token(TokenType.Integer, 1)),
-                new TreeNode<Token>(new Token(TokenType.Integer, 1)));
+            var tree = new TokenNode(new Token(operation),
+                new TokenNode(new Token(TokenType.Integer, 1)),
+                new TokenNode(new Token(TokenType.Integer, 1)));
+
+            return tree;
+        }
+
+        private static TokenNode BuildUnaryTree(TokenType operation)
+        {
+            var tree = new TokenNode(new Token(operation),
+                new TokenNode(new Token(operation),
+                    new TokenNode(new Token(TokenType.Integer, 1))
+                    ) {IsUnary = true}
+                ) {IsUnary = true};
 
             return tree;
         }

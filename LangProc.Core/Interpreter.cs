@@ -20,7 +20,7 @@ namespace LangProc.Core
         }
 
         // Evaluate AST from parser
-        public static int Crawl(TreeNode<Token> node)
+        public static int Crawl(TokenNode node)
         {
             switch (node.Data.Type)
             {
@@ -28,9 +28,9 @@ namespace LangProc.Core
                     return (int) node.Data.Value;
 
                 case TokenType.Add:
-                    return Crawl(node.LeftChild) + Crawl(node.RightChild);
+                    return node.IsUnary ? +Crawl(node.LeftChild) : Crawl(node.LeftChild) + Crawl(node.RightChild);
                 case TokenType.Sub:
-                    return Crawl(node.LeftChild) - Crawl(node.RightChild);
+                    return node.IsUnary ? -Crawl(node.LeftChild) : Crawl(node.LeftChild) - Crawl(node.RightChild);
                 case TokenType.Mult:
                     return Crawl(node.LeftChild) * Crawl(node.RightChild);
                 case TokenType.Div:

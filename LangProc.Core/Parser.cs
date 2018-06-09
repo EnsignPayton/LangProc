@@ -22,7 +22,7 @@ namespace LangProc.Core
             }
         }
 
-        public TreeNode<Token> Parse()
+        public TokenNode Parse()
         {
             // Grammar directly translates to parser
             // Variables -> Functions
@@ -44,7 +44,7 @@ namespace LangProc.Core
         }
 
         // Expression -> Term ( ( Add | Sub ) Term )*
-        private TreeNode<Token> ParseExpression()
+        private TokenNode ParseExpression()
         {
             var result = ParseTerm();
 
@@ -54,14 +54,14 @@ namespace LangProc.Core
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
 
-                result = new TreeNode<Token>(token, result, ParseTerm());
+                result = new TokenNode(token, result, ParseTerm());
             }
 
             return result;
         }
 
         // Term -> Factor ( ( Mult | Div ) Factor )*
-        private TreeNode<Token> ParseTerm()
+        private TokenNode ParseTerm()
         {
             var result = ParseFactor();
 
@@ -71,32 +71,38 @@ namespace LangProc.Core
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
 
-                result = new TreeNode<Token>(token, result, ParseFactor());
+                result = new TokenNode(token, result, ParseFactor());
             }
 
             return result;
         }
 
         // Factor -> Integer | ParenOpen Expression ParenClose
-        private TreeNode<Token> ParseFactor()
+        private TokenNode ParseFactor()
         {
-            if (_enumerator.Current.Type == TokenType.Integer)
+            switch (_enumerator.Current.Type)
             {
-                var token = _enumerator.Current;
-                _enumerator.MoveNext();
-                return new TreeNode<Token>(token);
-            }
-            else
-            {
-                ValidateType(_enumerator.Current, TokenType.ParenOpen);
-                _enumerator.MoveNext();
+                case TokenType.Integer:
+                    var token1 = _enumerator.Current;
+                    _enumerator.MoveNext();
+                    return new TokenNode(token1);
 
-                var result = ParseExpression();
+                case TokenType.Add:
+                case TokenType.Sub:
+                    var token2 = _enumerator.Current;
+                    _enumerator.MoveNext();
+                    return new TokenNode(token2, ParseFactor()) { IsUnary = true };
 
-                ValidateType(_enumerator.Current, TokenType.ParenClose);
-                _enumerator.MoveNext();
+                default:
+                    ValidateType(_enumerator.Current, TokenType.ParenOpen);
+                    _enumerator.MoveNext();
 
-                return result;
+                    var result = ParseExpression();
+
+                    ValidateType(_enumerator.Current, TokenType.ParenClose);
+                    _enumerator.MoveNext();
+
+                    return result;
             }
         }
 
