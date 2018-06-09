@@ -43,6 +43,11 @@
     <Compile Include="Interpreter.cs" />
     <Compile Include="Parser.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Symbols\BuiltInTypeSymbol.cs" />
+    <Compile Include="Symbols\Symbol.cs" />
+    <Compile Include="Symbols\VariableSymbol.cs" />
+    <Compile Include="SymbolTable.cs" />
+    <Compile Include="SymbolTableBuilder.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Tree\AssignmentNode.cs" />

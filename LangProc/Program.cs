@@ -1,32 +1,39 @@
 ﻿using System;
+using System.IO;
 using LangProc.Core;
+using LangProc.Core.Tree;
 
 namespace LangProc
 {
     internal class Program
     {
-        private static void Main()
+        private static void Main(string[] args)
         {
-            while (true)
+            try
             {
-                try
-                {
-                    var text = Console.ReadLine();
-                    if (text == null) break;
-                    var interpreter = new Interpreter();
-                    interpreter.Interpret(text);
-                    foreach (var kvp in interpreter.GlobalScope)
-                    {
-                        Console.WriteLine($"{kvp.Key} -> {kvp.Value}");
-                    }
+                string text = File.ReadAllText(args[0]);
+                var tokens = Tokenizer.GetTokens(text);
 
-                    Console.WriteLine();
-                }
-                catch (Exception ex)
+                TreeNode<Token> tree;
+                using (var parser = new Parser(tokens))
                 {
-                    Console.WriteLine(ex.Message);
+                    tree = parser.Parse();
                 }
+
+                var tableBuilder = new SymbolTableBuilder();
+                tableBuilder.Build(tree);
+
+                var interpreter = new Interpreter();
+                interpreter.Interpret(tree);
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+#if DEBUG
+            Console.Read();
+#endif
         }
     }
 }

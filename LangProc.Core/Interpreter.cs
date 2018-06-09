@@ -8,44 +8,22 @@ namespace LangProc.Core
     {
         public Interpreter()
         {
-            GlobalScope = new Dictionary<string, object>();
+            GlobalMemory = new Dictionary<string, object>();
         }
 
-        public IDictionary<string, object> GlobalScope { get; }
+        public IDictionary<string, object> GlobalMemory { get; }
 
-        public void Interpret(string text)
+        public void Interpret(TreeNode<Token> tree)
         {
-            var tokens = Tokenizer.GetTokens(text, true);
-
-            using (var parser = new Parser(tokens))
-            {
-                var tree = parser.Parse();
-
-                Visit(tree);
-            }
+            Visit(tree);
         }
 
-        public object Visit(TreeNode<Token> node)
+        #region Visit Tree
+
+        private object Visit(TreeNode<Token> node)
         {
             switch (node)
             {
-                case NumberNode node1:
-                    return Visit(node1);
-                case BinaryOperationNode node1:
-                    return Visit(node1);
-                case UnaryOperationNode node1:
-                    return Visit(node1);
-                case CompoundNode node1:
-                    Visit(node1);
-                    return null;
-                case AssignmentNode node1:
-                    Visit(node1);
-                    return null;
-                case VariableNode node1:
-                    return Visit(node1);
-                case NopNode node1:
-                    Visit(node1);
-                    return null;
                 case ProgramNode node1:
                     Visit(node1);
                     return null;
@@ -58,14 +36,52 @@ namespace LangProc.Core
                 case TypeNode node1:
                     Visit(node1);
                     return null;
+
+                case BinaryOperationNode node1:
+                    return Visit(node1);
+                case NumberNode node1:
+                    return Visit(node1);
+                case UnaryOperationNode node1:
+                    return Visit(node1);
+
+                case CompoundNode node1:
+                    Visit(node1);
+                    return null;
+                case AssignmentNode node1:
+                    Visit(node1);
+                    return null;
+                case VariableNode node1:
+                    return Visit(node1);
+                case NopNode node1:
+                    Visit(node1);
+                    return null;
+
                 default:
                     throw new InvalidOperationException("Unsupported node type.");
             }
         }
 
-        private object Visit(NumberNode node)
+        private void Visit(ProgramNode node)
         {
-            return node.Data.Value;
+            Visit(node.BlockNode);
+        }
+
+        private void Visit(BlockNode node)
+        {
+            foreach (var declaration in node.Declarations)
+            {
+                Visit(declaration);
+            }
+
+            Visit(node.CompoundNode);
+        }
+
+        private void Visit(DeclarationNode node)
+        {
+        }
+
+        private void Visit(TypeNode node)
+        {
         }
 
         private object Visit(BinaryOperationNode node)
@@ -91,6 +107,11 @@ namespace LangProc.Core
                 default:
                     throw new InvalidOperationException($"Token type {node.Data.Type} not expected for binary operations.");
             }
+        }
+
+        private object Visit(NumberNode node)
+        {
+            return node.Data.Value;
         }
 
         private object Visit(UnaryOperationNode node)
@@ -119,44 +140,23 @@ namespace LangProc.Core
         private void Visit(AssignmentNode node)
         {
             string varName = node.Variable.Data.Value.ToString();
-            GlobalScope[varName] = Visit(node.Value);
+            GlobalMemory[varName] = Visit(node.Value);
         }
 
         private object Visit(VariableNode node)
         {
             string varName = node.Data.Value.ToString();
 
-            if (GlobalScope.TryGetValue(varName, out var value))
+            if (GlobalMemory.TryGetValue(varName, out var value))
                 return value;
 
-            throw new InvalidOperationException($"Variable {varName} not defined");
+            throw new InvalidOperationException($"Variable {varName} not assigned a value");
         }
 
         private void Visit(NopNode node)
         {
         }
 
-        private void Visit(ProgramNode node)
-        {
-            Visit(node.BlockNode);
-        }
-
-        private void Visit(BlockNode node)
-        {
-            foreach (var declaration in node.Declarations)
-            {
-                Visit(declaration);
-            }
-
-            Visit(node.CompoundNode);
-        }
-
-        private void Visit(DeclarationNode node)
-        {
-        }
-
-        private void Visit(TypeNode node)
-        {
-        }
+        #endregion
     }
 }
