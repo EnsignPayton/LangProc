@@ -72,7 +72,7 @@ namespace LangProc.Core
                     numBuilder = null;
 
                     if (number.Contains("."))
-                        yield return new Token(TokenType.Real, float.Parse(number));
+                        yield return new Token(TokenType.Real, double.Parse(number));
                     else
                         yield return new Token(TokenType.Integer, int.Parse(number));
                 }
@@ -132,7 +132,7 @@ namespace LangProc.Core
                 string number = numBuilder.ToString();
 
                 if (number.Contains("."))
-                    yield return new Token(TokenType.Real, float.Parse(number));
+                    yield return new Token(TokenType.Real, double.Parse(number));
                 else 
                     yield return new Token(TokenType.Integer, int.Parse(number));
             }

@@ -14,7 +14,7 @@ namespace LangProc.Test
             // 1 + 1
             var tree = BuildBasicTree(TokenType.Add);
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(2));
         }
@@ -25,7 +25,7 @@ namespace LangProc.Test
             // 1 - 1
             var tree = BuildBasicTree(TokenType.Sub);
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(0));
         }
@@ -36,7 +36,7 @@ namespace LangProc.Test
             // 1 * 1
             var tree = BuildBasicTree(TokenType.Mult);
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(1));
         }
@@ -47,7 +47,7 @@ namespace LangProc.Test
             // 1 / 1
             var tree = BuildBasicTree(TokenType.Div);
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(1));
         }
@@ -63,7 +63,7 @@ namespace LangProc.Test
             var tree = new UnaryOperationNode(new Token(TokenType.Sub),
                 new NumberNode(new Token(TokenType.Integer, 1)));
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(-1));
         }
@@ -74,7 +74,7 @@ namespace LangProc.Test
             // +(+1)
             var tree = BuildUnaryTree(TokenType.Add);
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(1));
         }
@@ -85,7 +85,7 @@ namespace LangProc.Test
             // -(-1)
             var tree = BuildUnaryTree(TokenType.Sub);
             var interpreter = new Interpreter();
-            int result = interpreter.Visit(tree).Value;
+            var result = interpreter.Visit(tree);
 
             Assert.That(result, Is.EqualTo(1));
         }

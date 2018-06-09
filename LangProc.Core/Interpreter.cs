@@ -25,7 +25,7 @@ namespace LangProc.Core
             }
         }
 
-        public int? Visit(TreeNode<Token> node)
+        public object Visit(TreeNode<Token> node)
         {
             switch (node)
             {
@@ -63,38 +63,46 @@ namespace LangProc.Core
             }
         }
 
-        private int Visit(NumberNode node)
+        private object Visit(NumberNode node)
         {
-            return (int) node.Data.Value;
+            return node.Data.Value;
         }
 
-        private int Visit(BinaryOperationNode node)
+        private object Visit(BinaryOperationNode node)
         {
+            bool isLeftInteger = node.LeftChild.Data.Type == TokenType.Integer;
+            bool isRightInteger = node.RightChild.Data.Type == TokenType.Integer;
+
             switch (node.Data.Type)
             {
                 case TokenType.Add:
-                    return Visit(node.LeftChild).Value + Visit(node.RightChild).Value;
+                    return (isLeftInteger ? (int) Visit(node.LeftChild) : (double) Visit(node.LeftChild)) +
+                           (isRightInteger ? (int) Visit(node.RightChild) : (double) Visit(node.RightChild));
                 case TokenType.Sub:
-                    return Visit(node.LeftChild).Value - Visit(node.RightChild).Value;
+                    return (isLeftInteger ? (int)Visit(node.LeftChild) : (double)Visit(node.LeftChild)) -
+                           (isRightInteger ? (int)Visit(node.RightChild) : (double)Visit(node.RightChild));
                 case TokenType.Mult:
-                    return Visit(node.LeftChild).Value * Visit(node.RightChild).Value;
+                    return (isLeftInteger ? (int)Visit(node.LeftChild) : (double)Visit(node.LeftChild)) *
+                           (isRightInteger ? (int)Visit(node.RightChild) : (double)Visit(node.RightChild));
                 case TokenType.Div:
-                    return Visit(node.LeftChild).Value / Visit(node.RightChild).Value;
+                    return (int) Visit(node.LeftChild) / (int) Visit(node.RightChild);
                 case TokenType.FloatDiv:
-                    return Visit(node.LeftChild).Value / Visit(node.RightChild).Value;
+                    return (double) Visit(node.LeftChild) / (double) Visit(node.RightChild);
                 default:
                     throw new InvalidOperationException($"Token type {node.Data.Type} not expected for binary operations.");
             }
         }
 
-        private int Visit(UnaryOperationNode node)
+        private object Visit(UnaryOperationNode node)
         {
+            bool isInteger = node.Value.Data.Type == TokenType.Integer;
+
             switch (node.Data.Type)
             {
                 case TokenType.Add:
-                    return +Visit(node.Value).Value;
+                    return isInteger ? +(int) Visit(node.Value) : +(double) Visit(node.Value);
                 case TokenType.Sub:
-                    return -Visit(node.Value).Value;
+                    return isInteger ? -(int) Visit(node.Value) : -(double) Visit(node.Value);
                 default:
                     throw new InvalidOperationException($"Token type {node.Data.Type} not expected for unary operations.");
             }
@@ -114,12 +122,12 @@ namespace LangProc.Core
             GlobalScope[varName] = Visit(node.Value);
         }
 
-        private int Visit(VariableNode node)
+        private object Visit(VariableNode node)
         {
             string varName = node.Data.Value.ToString();
 
             if (GlobalScope.TryGetValue(varName, out var value))
-                return (int) value;
+                return value;
 
             throw new InvalidOperationException($"Variable {varName} not defined");
         }

@@ -78,5 +78,123 @@ namespace LangProc.Test
                 TokenType.EndOfFile
             }));
         }
+
+        [Test]
+        public void PascalProgram()
+        {
+            const string input = @"PROGRAM Test;
+VAR
+    number      : INTEGER;
+    a, b, c, x  : INTEGER;
+    y           : REAL;
+
+BEGIN {Test}
+    BEGIN
+        number := 2;
+        a := number;
+        b := 10 * a + 10 * number DIV 4;
+        c := a - - b
+    END;
+    x := 11;
+    y := 20 / 7 + 3.14;
+END. {Test}
+";
+
+            var tokenTypes = Tokenizer.GetTokens(input).Select(t => t.Type).ToList();
+            Assert.That(tokenTypes, Is.EquivalentTo(new[]
+            {
+                // PROGRAM Test;
+                TokenType.Program,
+                TokenType.Id,
+                TokenType.Semi,
+
+                // VAR
+                TokenType.Var,
+
+                // number      : INTEGER;
+                TokenType.Id,
+                TokenType.Colon,
+                TokenType.DeclInteger,
+                TokenType.Semi,
+
+                // a, b, c, x  : INTEGER;
+                TokenType.Id,
+                TokenType.Comma,
+                TokenType.Id,
+                TokenType.Comma,
+                TokenType.Id,
+                TokenType.Comma,
+                TokenType.Id,
+                TokenType.Colon,
+                TokenType.DeclInteger,
+                TokenType.Semi,
+
+                // y           : REAL;
+                TokenType.Id,
+                TokenType.Colon,
+                TokenType.DeclReal,
+                TokenType.Semi,
+
+                TokenType.Begin,
+                TokenType.Begin,
+
+                // number := 2;
+                TokenType.Id,
+                TokenType.Assign,
+                TokenType.Integer,
+                TokenType.Semi,
+
+                // a := number;
+                TokenType.Id,
+                TokenType.Assign,
+                TokenType.Id,
+                TokenType.Semi,
+
+                // b := 10 * a + 10 * number DIV 4;
+                TokenType.Id,
+                TokenType.Assign,
+                TokenType.Integer,
+                TokenType.Mult,
+                TokenType.Id,
+                TokenType.Add,
+                TokenType.Integer,
+                TokenType.Mult,
+                TokenType.Id,
+                TokenType.Div,
+                TokenType.Integer,
+                TokenType.Semi,
+
+                // c := a - - b
+                TokenType.Id,
+                TokenType.Assign,
+                TokenType.Id,
+                TokenType.Sub,
+                TokenType.Sub,
+                TokenType.Id,
+
+                TokenType.End,
+                TokenType.Semi,
+
+                // x := 11;
+                TokenType.Id,
+                TokenType.Assign,
+                TokenType.Integer,
+                TokenType.Semi,
+
+                // y := 20 / 7 + 3.14;
+                TokenType.Id,
+                TokenType.Assign,
+                TokenType.Integer,
+                TokenType.FloatDiv,
+                TokenType.Integer,
+                TokenType.Add,
+                TokenType.Real,
+                TokenType.Semi,
+
+                TokenType.End,
+                TokenType.Dot,
+                TokenType.EndOfFile
+            }));
+        }
     }
 }
