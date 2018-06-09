@@ -2,15 +2,15 @@
 {
     public class AssignmentNode : TreeNode<Token>
     {
-        public AssignmentNode(Token token, TreeNode<Token> leftChild = null, TreeNode<Token> rightChild = null)
+        public AssignmentNode(Token token, VariableNode variable = null, TreeNode<Token> value = null)
             : base(token)
         {
-            LeftChild = leftChild;
-            RightChild = rightChild;
+            Variable = variable;
+            Value = value;
         }
 
-        public TreeNode<Token> LeftChild { get; }
+        public VariableNode Variable { get; }
 
-        public TreeNode<Token> RightChild { get; }
+        public TreeNode<Token> Value { get; }
     }
 }

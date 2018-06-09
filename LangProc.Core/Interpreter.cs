@@ -29,22 +29,34 @@ namespace LangProc.Core
         {
             switch (node)
             {
-                case NumberNode numberNode:
-                    return Visit(numberNode);
-                case BinaryOperationNode binNode:
-                    return Visit(binNode);
-                case UnaryOperationNode unNode:
-                    return Visit(unNode);
-                case CompoundNode compoundNode:
-                    Visit(compoundNode);
+                case NumberNode node1:
+                    return Visit(node1);
+                case BinaryOperationNode node1:
+                    return Visit(node1);
+                case UnaryOperationNode node1:
+                    return Visit(node1);
+                case CompoundNode node1:
+                    Visit(node1);
                     return null;
-                case AssignmentNode assignmentNode:
-                    Visit(assignmentNode);
+                case AssignmentNode node1:
+                    Visit(node1);
                     return null;
-                case VariableNode varNode:
-                    return Visit(varNode);
-                case NopNode unNode:
-                    Visit(unNode);
+                case VariableNode node1:
+                    return Visit(node1);
+                case NopNode node1:
+                    Visit(node1);
+                    return null;
+                case ProgramNode node1:
+                    Visit(node1);
+                    return null;
+                case BlockNode node1:
+                    Visit(node1);
+                    return null;
+                case DeclarationNode node1:
+                    Visit(node1);
+                    return null;
+                case TypeNode node1:
+                    Visit(node1);
                     return null;
                 default:
                     throw new InvalidOperationException("Unsupported node type.");
@@ -67,6 +79,8 @@ namespace LangProc.Core
                 case TokenType.Mult:
                     return Visit(node.LeftChild).Value * Visit(node.RightChild).Value;
                 case TokenType.Div:
+                    return Visit(node.LeftChild).Value / Visit(node.RightChild).Value;
+                case TokenType.FloatDiv:
                     return Visit(node.LeftChild).Value / Visit(node.RightChild).Value;
                 default:
                     throw new InvalidOperationException($"Token type {node.Data.Type} not expected for binary operations.");
@@ -96,8 +110,8 @@ namespace LangProc.Core
 
         private void Visit(AssignmentNode node)
         {
-            string varName = node.LeftChild.Data.Value.ToString();
-            GlobalScope[varName] = Visit(node.RightChild);
+            string varName = node.Variable.Data.Value.ToString();
+            GlobalScope[varName] = Visit(node.Value);
         }
 
         private int Visit(VariableNode node)
@@ -112,7 +126,29 @@ namespace LangProc.Core
 
         private void Visit(NopNode node)
         {
-            // Nop
+        }
+
+        private void Visit(ProgramNode node)
+        {
+            Visit(node.BlockNode);
+        }
+
+        private void Visit(BlockNode node)
+        {
+            foreach (var declaration in node.Declarations)
+            {
+                Visit(declaration);
+            }
+
+            Visit(node.CompoundNode);
+        }
+
+        private void Visit(DeclarationNode node)
+        {
+        }
+
+        private void Visit(TypeNode node)
+        {
         }
     }
 }

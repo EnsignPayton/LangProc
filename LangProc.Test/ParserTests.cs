@@ -11,10 +11,13 @@ namespace LangProc.Test
         #region Pascal Basic
 
         [Test]
-        public void EmptyBlock()
+        public void EmptyProgram()
         {
             var tokens = new[]
             {
+                new Token(TokenType.Program),
+                new Token(TokenType.Id),
+                new Token(TokenType.Semi),
                 new Token(TokenType.Begin),
                 new Token(TokenType.End),
                 new Token(TokenType.Dot), 
@@ -25,7 +28,7 @@ namespace LangProc.Test
             {
                 var result = parser.Parse();
 
-                Assert.That(result is CompoundNode);
+                Assert.That(result is ProgramNode);
             }
         }
 
@@ -36,6 +39,9 @@ namespace LangProc.Test
         {
             var tokens = new[]
             {
+                new Token(TokenType.Program),
+                new Token(TokenType.Id),
+                new Token(TokenType.Semi),
                 new Token(TokenType.Begin),
                 new Token(TokenType.Id, varName),
                 new Token(TokenType.Assign),
@@ -47,15 +53,13 @@ namespace LangProc.Test
 
             using (var parser = new Parser(tokens))
             {
-                var result = (CompoundNode) parser.Parse();
+                var result = (ProgramNode) parser.Parse();
+                var block = result.BlockNode;
+                var compound = block.CompoundNode;
+                var assign = (AssignmentNode) compound.Children.First();
 
-                var assign = (AssignmentNode) result.Children.First();
-
-                var variable = assign.LeftChild;
-                var value = assign.RightChild;
-
-                Assert.That(variable.Data.Value, Is.EqualTo(varName));
-                Assert.That(value.Data.Value, Is.EqualTo(varValue));
+                Assert.That(assign.Variable.Data.Value, Is.EqualTo(varName));
+                Assert.That(assign.Value.Data.Value, Is.EqualTo(varValue));
             }
         }
 

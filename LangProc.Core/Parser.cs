@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using LangProc.Core.Tree;
 
 namespace LangProc.Core
 {
-    public class Parser : IDisposable
+    public sealed class Parser : IDisposable
     {
         private IEnumerator<Token> _enumerator;
 
@@ -13,6 +14,8 @@ namespace LangProc.Core
             _enumerator = tokens.GetEnumerator();
             _enumerator.MoveNext();
         }
+
+        private Token Current => _enumerator.Current;
 
         public void Dispose()
         {
@@ -23,27 +26,93 @@ namespace LangProc.Core
             }
         }
 
+        /// <summary>
+        /// Parses the token sequence into an AST.
+        /// </summary>
+        /// <returns>Root node of AST</returns>
         public TreeNode<Token> Parse()
         {
             var result =  ParseProgram();
 
-            ValidateType(_enumerator.Current, TokenType.EndOfFile);
+            ValidateType(Current, TokenType.EndOfFile);
 
             return result;
         }
 
-        // Program -> CompoundStatement Dot
-        private TreeNode<Token> ParseProgram()
+        private ProgramNode ParseProgram()
         {
-            var node = ParseCompoundStatement();
+            Eat(TokenType.Program);
+
+            var varNode = new VariableNode(Current);
+            Eat(TokenType.Id);
+            Eat(TokenType.Semi);
+
+            var blockNode = ParseBlock();
 
             Eat(TokenType.Dot);
 
-            return node;
+            return new ProgramNode(varNode, blockNode);
         }
 
-        // CompoundStatement -> Begin StatementList End
-        private TreeNode<Token> ParseCompoundStatement()
+        private BlockNode ParseBlock()
+        {
+            var declarations = ParseDeclarations();
+            var compound = ParseCompoundStatement();
+            return new BlockNode(declarations, compound);
+        }
+
+        private IEnumerable<DeclarationNode> ParseDeclarations()
+        {
+            var results = new List<DeclarationNode>();
+
+            if (Current.Type == TokenType.Var)
+            {
+                Eat(TokenType.Var);
+
+                while (Current.Type == TokenType.Id)
+                {
+                    var declaration = ParseDeclaration();
+                    results.AddRange(declaration);
+                    Eat(TokenType.Semi);
+                }
+            }
+
+            return results;
+        }
+
+        private IEnumerable<DeclarationNode> ParseDeclaration()
+        {
+            var variables = new List<VariableNode>
+            {
+                new VariableNode(Current)
+            };
+
+            Eat(TokenType.Id);
+
+            while (Current.Type == TokenType.Comma)
+            {
+                Eat(TokenType.Comma);
+                variables.Add(new VariableNode(Current));
+                Eat(TokenType.Id);
+            }
+
+            Eat(TokenType.Colon);
+
+            var type = ParseType();
+
+            return variables.Select(v => new DeclarationNode(v, type));
+        }
+
+        private TypeNode ParseType()
+        {
+            var token = Current;
+
+            Eat(TokenType.DeclInteger, TokenType.DeclReal);
+
+            return new TypeNode(token);
+        }
+
+        private CompoundNode ParseCompoundStatement()
         {
             Eat(TokenType.Begin);
 
@@ -51,16 +120,10 @@ namespace LangProc.Core
 
             Eat(TokenType.End);
 
-            var root = new CompoundNode(null, null);
-
-            foreach (var node in nodes)
-                root.Children.Add(node);
-
-            return root;
+            return new CompoundNode(nodes);
         }
 
-        // StatementList -> Statement | Statement Semi StatementList
-        private List<TreeNode<Token>> ParseStatementList()
+        private IEnumerable<TreeNode<Token>> ParseStatementList()
         {
             var results = new List<TreeNode<Token>>();
 
@@ -68,37 +131,35 @@ namespace LangProc.Core
 
             results.Add(node);
 
-            while (_enumerator.Current.Type == TokenType.Semi)
+            while (Current.Type == TokenType.Semi)
             {
                 Eat(TokenType.Semi);
                 results.Add(ParseStatement());
             }
 
-            if (_enumerator.Current.Type == TokenType.Id)
+            if (Current.Type == TokenType.Id)
                 throw new InvalidOperationException($"Token type {TokenType.Id} was not expected.");
 
             return results;
         }
 
-        // Statement -> CompoundStatement | AssignmentStatement | Nop
         private TreeNode<Token> ParseStatement()
         {
-            if (_enumerator.Current.Type == TokenType.Begin)
+            if (Current.Type == TokenType.Begin)
                 return ParseCompoundStatement();
 
-            if (_enumerator.Current.Type == TokenType.Id)
+            if (Current.Type == TokenType.Id)
                 return ParseAssignmentStatement();
 
-            return new NopNode(null);
+            return new NopNode();
         }
 
-        // AssignmentStatement -> Variable Assign Expression
-        private TreeNode<Token> ParseAssignmentStatement()
+        private AssignmentNode ParseAssignmentStatement()
         {
-            var left = new VariableNode(_enumerator.Current);
+            var left = new VariableNode(Current);
             Eat(TokenType.Id);
 
-            var token = _enumerator.Current;
+            var token = Current;
             Eat(TokenType.Assign);
 
             var right = ParseExpression();
@@ -106,15 +167,14 @@ namespace LangProc.Core
             return new AssignmentNode(token, left, right);
         }
 
-        // Expression -> Term ( ( Add | Sub ) Term )*
         private TreeNode<Token> ParseExpression()
         {
             var result = ParseTerm();
 
             var ops = new List<TokenType> {TokenType.Add, TokenType.Sub};
-            while (ops.Contains(_enumerator.Current.Type))
+            while (ops.Contains(Current.Type))
             {
-                var token = _enumerator.Current;
+                var token = Current;
                 Eat(TokenType.Add, TokenType.Sub);
 
                 result = new BinaryOperationNode(token, result, ParseTerm());
@@ -123,16 +183,15 @@ namespace LangProc.Core
             return result;
         }
 
-        // Term -> Factor ( ( Mult | Div ) Factor )*
         private TreeNode<Token> ParseTerm()
         {
             var result = ParseFactor();
 
-            var ops = new List<TokenType> {TokenType.Mult, TokenType.Div};
-            while (ops.Contains(_enumerator.Current.Type))
+            var ops = new List<TokenType> {TokenType.Mult, TokenType.Div, TokenType.FloatDiv};
+            while (ops.Contains(Current.Type))
             {
-                var token = _enumerator.Current;
-                Eat(TokenType.Mult, TokenType.Div);
+                var token = Current;
+                Eat(TokenType.Mult, TokenType.Div, TokenType.FloatDiv);
 
                 result = new BinaryOperationNode(token, result, ParseFactor());
             }
@@ -140,15 +199,15 @@ namespace LangProc.Core
             return result;
         }
 
-        // Factor -> Integer | ParenOpen Expression ParenClose
         private TreeNode<Token> ParseFactor()
         {
-            var token = _enumerator.Current;
+            var token = Current;
 
-            switch (_enumerator.Current.Type)
+            switch (token.Type)
             {
                 case TokenType.Integer:
-                    Eat(TokenType.Integer);
+                case TokenType.Real:
+                    Eat(TokenType.Integer, TokenType.Real);
                     return new NumberNode(token);
 
                 case TokenType.Add:
@@ -175,7 +234,7 @@ namespace LangProc.Core
         /// <exception cref="InvalidOperationException"/>
         private void Eat(params TokenType[] types)
         {
-            ValidateType(_enumerator.Current, types);
+            ValidateType(Current, types);
             _enumerator.MoveNext();
         }
 

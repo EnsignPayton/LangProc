@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LangProc.Core.Tree
+﻿namespace LangProc.Core.Tree
 {
     public class VariableNode : TreeNode<Token>
     {

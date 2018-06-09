@@ -2,7 +2,7 @@
 {
     public class NopNode : TreeNode<Token>
     {
-        public NopNode(Token token) : base(token)
+        public NopNode() : base(null)
         {
         }
     }

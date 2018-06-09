@@ -48,10 +48,14 @@
     <Compile Include="Tree\AssignmentNode.cs" />
     <Compile Include="Tree\BinaryOperationNode.cs" />
     <Compile Include="TokenType.cs" />
+    <Compile Include="Tree\BlockNode.cs" />
     <Compile Include="Tree\CompoundNode.cs" />
+    <Compile Include="Tree\DeclarationNode.cs" />
     <Compile Include="Tree\NopNode.cs" />
     <Compile Include="Tree\NumberNode.cs" />
+    <Compile Include="Tree\ProgramNode.cs" />
     <Compile Include="Tree\TreeNode.cs" />
+    <Compile Include="Tree\TypeNode.cs" />
     <Compile Include="Tree\UnaryOperationNode.cs" />
     <Compile Include="Tree\VariableNode.cs" />
   </ItemGroup>
