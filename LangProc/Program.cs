@@ -1,38 +1,11 @@
 ﻿using System;
-using System.IO;
 using LangProc.Core;
 
 namespace LangProc
 {
     internal class Program
     {
-        private static void Main(string[] args)
-        {
-            if (args.Length == 0)
-                HandleInput();
-            else
-                HandleFile(args[0]);
-
-#if DEBUG
-            Console.Read();
-#endif
-        }
-
-        private static void HandleFile(string filePath)
-        {
-            try
-            {
-                var text = File.ReadAllText(filePath);
-                var result = Interpreter.ParseExpression(text);
-                Console.WriteLine(result);
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        private static void HandleInput()
+        private static void Main()
         {
             while (true)
             {
@@ -40,8 +13,14 @@ namespace LangProc
                 {
                     var text = Console.ReadLine();
                     if (text == null) break;
-                    var result = Interpreter.ParseExpression(text);
-                    Console.WriteLine(result);
+                    var interpreter = new Interpreter();
+                    interpreter.Interpret(text);
+                    foreach (var kvp in interpreter.GlobalScope)
+                    {
+                        Console.WriteLine($"{kvp.Key} -> {kvp.Value}");
+                    }
+
+                    Console.WriteLine();
                 }
                 catch (Exception ex)
                 {

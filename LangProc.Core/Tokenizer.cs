@@ -6,6 +6,18 @@ namespace LangProc.Core
 {
     public static class Tokenizer
     {
+        private static readonly Dictionary<char, TokenType> SingleCharTypes = new Dictionary<char, TokenType>
+        {
+            {'+', TokenType.Add},
+            {'-', TokenType.Sub},
+            {'*', TokenType.Mult},
+            //{'/', TokenType.Div}, Handled by "div" keyword
+            {'(', TokenType.ParenOpen},
+            {')', TokenType.ParenClose},
+            {';', TokenType.Semi},
+            {'.', TokenType.Dot},
+        };
+
         /// <summary>
         /// Tokenize an expression string
         /// </summary>
@@ -31,7 +43,7 @@ namespace LangProc.Core
                     intBuilder = null;
                 }
 
-                if (wordBuilder != null && !char.IsLetter(value))
+                if (wordBuilder != null && !char.IsLetter(value) && value != '_')
                 {
                     yield return GetWordToken(wordBuilder.ToString());
                     wordBuilder = null;
@@ -39,30 +51,14 @@ namespace LangProc.Core
 
                 if (char.IsWhiteSpace(value)) continue;
 
-                if (Token.TryParseOperator(value, out var token))
+                if (TryGetSingleCharToken(value, out var token))
                 {
                     yield return token;
-                }
-                else if (value =='(')
-                {
-                    yield return new Token(TokenType.ParenOpen, value);
-                }
-                else if (value == ')')
-                {
-                    yield return new Token(TokenType.ParenClose, value);
                 }
                 else if (value == ':' && nextValue == '=')
                 {
                     ++i;
                     yield return new Token(TokenType.Assign);
-                }
-                else if (value == ';')
-                {
-                    yield return new Token(TokenType.Semi, value);
-                }
-                else if (value == '.')
-                {
-                    yield return new Token(TokenType.Dot);
                 }
                 else if (char.IsDigit(value))
                 {
@@ -72,7 +68,7 @@ namespace LangProc.Core
                     else
                         intBuilder.Append(value);
                 }
-                else if (char.IsLetter(value))
+                else if (char.IsLetter(value) || value == '_')
                 {
                     if (wordBuilder == null)
                         wordBuilder = new StringBuilder(value.ToString());
@@ -98,15 +94,34 @@ namespace LangProc.Core
             yield return new Token(TokenType.EndOfFile);
         }
 
+        private static bool TryGetSingleCharToken(char value, out Token token)
+        {
+            try
+            {
+                var type = SingleCharTypes[value];
+                token = new Token(type, value);
+                return true;
+            }
+            catch (KeyNotFoundException)
+            {
+                token = null;
+                return false;
+            }
+        }
+
         private static Token GetWordToken(string word)
         {
-            if (word == "BEGIN")
-                return new Token(TokenType.Begin, word);
-
-            if (word == "END")
-                return new Token(TokenType.End, word);
-
-            return new Token(TokenType.Id, word);
+            switch (word.ToUpper())
+            {
+                case "BEGIN":
+                    return new Token(TokenType.Begin, word);
+                case "END":
+                    return new Token(TokenType.End, word);
+                case "DIV":
+                    return new Token(TokenType.Div, word);
+                default:
+                    return new Token(TokenType.Id, word);
+            }
         }
     }
 }

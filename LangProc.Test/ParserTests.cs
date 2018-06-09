@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using LangProc.Core;
 using LangProc.Core.Tree;
 using NUnit.Framework;
@@ -7,9 +8,63 @@ namespace LangProc.Test
 {
     public class ParserTests
     {
+        #region Pascal Basic
+
+        [Test]
+        public void EmptyBlock()
+        {
+            var tokens = new[]
+            {
+                new Token(TokenType.Begin),
+                new Token(TokenType.End),
+                new Token(TokenType.Dot), 
+                new Token(TokenType.EndOfFile)
+            };
+
+            using (var parser = new Parser(tokens))
+            {
+                var result = parser.Parse();
+
+                Assert.That(result is CompoundNode);
+            }
+        }
+
+        [Test]
+        [TestCase("apple", 12)]
+        [TestCase("BANANA", 24)]
+        public void AssignsVariables(string varName, int varValue)
+        {
+            var tokens = new[]
+            {
+                new Token(TokenType.Begin),
+                new Token(TokenType.Id, varName),
+                new Token(TokenType.Assign),
+                new Token(TokenType.Integer, varValue),
+                new Token(TokenType.End),
+                new Token(TokenType.Dot),
+                new Token(TokenType.EndOfFile)
+            };
+
+            using (var parser = new Parser(tokens))
+            {
+                var result = (CompoundNode) parser.Parse();
+
+                var assign = (AssignmentNode) result.Children.First();
+
+                var variable = assign.LeftChild;
+                var value = assign.RightChild;
+
+                Assert.That(variable.Data.Value, Is.EqualTo(varName));
+                Assert.That(value.Data.Value, Is.EqualTo(varValue));
+            }
+        }
+
+        #endregion
+
         #region Order Of Operations
 
         [Test]
+        [Ignore("Changed from simple expressions to Pascal")]
         public void OrderOfOperations()
         {
             var tokens = new[]
@@ -31,6 +86,7 @@ namespace LangProc.Test
         }
 
         [Test]
+        [Ignore("Changed from simple expressions to Pascal")]
         public void OrderOfOperationsWithParen()
         {
             var tokens = new[]
@@ -58,6 +114,7 @@ namespace LangProc.Test
         #region Unary Operations
 
         [Test]
+        [Ignore("Changed from simple expressions to Pascal")]
         public void UnaryPlus()
         {
             var tokens = new[]
@@ -76,6 +133,7 @@ namespace LangProc.Test
         }
 
         [Test]
+        [Ignore("Changed from simple expressions to Pascal")]
         public void UnaryMinus()
         {
             var tokens = new[]
