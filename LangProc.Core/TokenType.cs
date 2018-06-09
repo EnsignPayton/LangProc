@@ -9,6 +9,12 @@
         Sub,
         Mult,
         Div,
+        Begin,
+        End,
+        Dot,
+        Assign,
+        Semi,
+        Id,
         EndOfFile,
         Unknown
     }

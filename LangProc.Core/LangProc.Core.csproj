@@ -45,9 +45,11 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
-    <Compile Include="TokenNode.cs" />
+    <Compile Include="Tree\BinaryOperationNode.cs" />
     <Compile Include="TokenType.cs" />
-    <Compile Include="TreeNode.cs" />
+    <Compile Include="Tree\NumberNode.cs" />
+    <Compile Include="Tree\TreeNode.cs" />
+    <Compile Include="Tree\UnaryOperationNode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,4 +1,5 @@
 ﻿using System;
+using LangProc.Core.Tree;
 
 namespace LangProc.Core
 {
@@ -15,29 +16,57 @@ namespace LangProc.Core
             {
                 var tree = parser.Parse();
 
-                return Crawl(tree);
+                return Visit(tree);
             }
         }
 
-        // Evaluate AST from parser
-        public static int Crawl(TokenNode node)
+        public static int Visit(TreeNode<Token> node)
+        {
+            switch (node)
+            {
+                case NumberNode numberNode:
+                    return Visit(numberNode);
+                case BinaryOperationNode binNode:
+                    return Visit(binNode);
+                case UnaryOperationNode unNode:
+                    return Visit(unNode);
+                default:
+                    throw new InvalidOperationException("Unsupported node type.");
+            }
+        }
+
+        private static int Visit(NumberNode node)
+        {
+            return (int) node.Data.Value;
+        }
+
+        private static int Visit(BinaryOperationNode node)
         {
             switch (node.Data.Type)
             {
-                case TokenType.Integer:
-                    return (int) node.Data.Value;
-
                 case TokenType.Add:
-                    return node.IsUnary ? +Crawl(node.LeftChild) : Crawl(node.LeftChild) + Crawl(node.RightChild);
+                    return Visit(node.LeftChild) + Visit(node.RightChild);
                 case TokenType.Sub:
-                    return node.IsUnary ? -Crawl(node.LeftChild) : Crawl(node.LeftChild) - Crawl(node.RightChild);
+                    return Visit(node.LeftChild) - Visit(node.RightChild);
                 case TokenType.Mult:
-                    return Crawl(node.LeftChild) * Crawl(node.RightChild);
+                    return Visit(node.LeftChild) * Visit(node.RightChild);
                 case TokenType.Div:
-                    return Crawl(node.LeftChild) / Crawl(node.RightChild);
-
+                    return Visit(node.LeftChild) / Visit(node.RightChild);
                 default:
-                    throw new InvalidOperationException($"Token type {node.Data.Type} was not expected.");
+                    throw new InvalidOperationException($"Token type {node.Data.Type} not expected for binary operations.");
+            }
+        }
+
+        private static int Visit(UnaryOperationNode node)
+        {
+            switch (node.Data.Type)
+            {
+                case TokenType.Add:
+                    return +Visit(node.Value);
+                case TokenType.Sub:
+                    return -Visit(node.Value);
+                default:
+                    throw new InvalidOperationException($"Token type {node.Data.Type} not expected for unary operations.");
             }
         }
     }

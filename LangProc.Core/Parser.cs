@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using LangProc.Core.Tree;
 
 namespace LangProc.Core
 {
@@ -22,7 +23,7 @@ namespace LangProc.Core
             }
         }
 
-        public TokenNode Parse()
+        public TreeNode<Token> Parse()
         {
             // Grammar directly translates to parser
             // Variables -> Functions
@@ -44,7 +45,7 @@ namespace LangProc.Core
         }
 
         // Expression -> Term ( ( Add | Sub ) Term )*
-        private TokenNode ParseExpression()
+        private TreeNode<Token> ParseExpression()
         {
             var result = ParseTerm();
 
@@ -54,14 +55,14 @@ namespace LangProc.Core
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
 
-                result = new TokenNode(token, result, ParseTerm());
+                result = new BinaryOperationNode(token, result, ParseTerm());
             }
 
             return result;
         }
 
         // Term -> Factor ( ( Mult | Div ) Factor )*
-        private TokenNode ParseTerm()
+        private TreeNode<Token> ParseTerm()
         {
             var result = ParseFactor();
 
@@ -71,27 +72,27 @@ namespace LangProc.Core
                 var token = _enumerator.Current;
                 _enumerator.MoveNext();
 
-                result = new TokenNode(token, result, ParseFactor());
+                result = new BinaryOperationNode(token, result, ParseFactor());
             }
 
             return result;
         }
 
         // Factor -> Integer | ParenOpen Expression ParenClose
-        private TokenNode ParseFactor()
+        private TreeNode<Token> ParseFactor()
         {
             switch (_enumerator.Current.Type)
             {
                 case TokenType.Integer:
                     var token1 = _enumerator.Current;
                     _enumerator.MoveNext();
-                    return new TokenNode(token1);
+                    return new NumberNode(token1);
 
                 case TokenType.Add:
                 case TokenType.Sub:
                     var token2 = _enumerator.Current;
                     _enumerator.MoveNext();
-                    return new TokenNode(token2, ParseFactor()) { IsUnary = true };
+                    return new UnaryOperationNode(token2, ParseFactor());
 
                 default:
                     ValidateType(_enumerator.Current, TokenType.ParenOpen);

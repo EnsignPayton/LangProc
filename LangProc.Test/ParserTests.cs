@@ -1,5 +1,6 @@
 ﻿using System;
 using LangProc.Core;
+using LangProc.Core.Tree;
 using NUnit.Framework;
 
 namespace LangProc.Test
@@ -70,7 +71,7 @@ namespace LangProc.Test
             {
                 var result = parser.Parse();
 
-                Assert.That(result.IsUnary);
+                Assert.That(result is UnaryOperationNode);
             }
         }
 
@@ -88,7 +89,7 @@ namespace LangProc.Test
             {
                 var result = parser.Parse();
 
-                Assert.That(result.IsUnary);
+                Assert.That(result is UnaryOperationNode);
             }
         }
 
