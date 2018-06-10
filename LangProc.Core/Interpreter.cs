@@ -55,6 +55,9 @@ namespace LangProc.Core
                 case NopNode node1:
                     Visit(node1);
                     return null;
+                case ProcedureNode node1:
+                    Visit(node1);
+                    return null;
 
                 default:
                     throw new InvalidOperationException("Unsupported node type.");
@@ -154,6 +157,10 @@ namespace LangProc.Core
         }
 
         private void Visit(NopNode node)
+        {
+        }
+
+        private void Visit(ProcedureNode node)
         {
         }
 

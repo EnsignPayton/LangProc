@@ -4,9 +4,9 @@ using LangProc.Core.Tree;
 
 namespace LangProc.Core
 {
-    public class SymbolTableBuilder
+    public class SemanticAnalyzer
     {
-        public SymbolTable SymbolTable { get; } = new SymbolTable();
+        public SymbolTable Scope { get; } = new SymbolTable("GLOBAL", 1);
 
         public void Build(TreeNode<Token> tree)
         {
@@ -47,6 +47,9 @@ namespace LangProc.Core
                     Visit(node1);
                     break;
                 case VariableNode node1:
+                    Visit(node1);
+                    break;
+                case ProcedureNode node1:
                     Visit(node1);
                     break;
             }
@@ -97,16 +100,21 @@ namespace LangProc.Core
         private void Visit(DeclarationNode node)
         {
             var typeName = node.TypeNode.Data.Type.ToString();
-            var typeSymbol = SymbolTable.Lookup(typeName);
+            var typeSymbol = Scope.Lookup(typeName);
+
             var varName = node.VariableNode.Data.Value.ToString();
             var varSymbol = new VariableSymbol(varName, typeSymbol);
-            SymbolTable.Define(varSymbol);
+
+            //if (Scope.Lookup(varName) != null)
+            //    throw new InvalidOperationException($"Variable {varName} has already been declared.");
+
+            Scope.Insert(varSymbol);
         }
 
         private void Visit(AssignmentNode node)
         {
             var varName = node.Variable.Data.Value.ToString();
-            var varSymbol = SymbolTable.Lookup(varName);
+            var varSymbol = Scope.Lookup(varName);
             if (varSymbol == null)
                 throw new InvalidOperationException($"Variable {varName} was not declared.");
 
@@ -116,9 +124,13 @@ namespace LangProc.Core
         private void Visit(VariableNode node)
         {
             var varName = node.Data.Value.ToString();
-            var varSymbol = SymbolTable.Lookup(varName);
+            var varSymbol = Scope.Lookup(varName);
             if (varSymbol == null)
                 throw new InvalidOperationException($"Variable {varName} was not declared.");
+        }
+
+        private void Visit(ProcedureNode node)
+        {
         }
 
         #endregion

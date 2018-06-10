@@ -47,7 +47,7 @@
     <Compile Include="Symbols\Symbol.cs" />
     <Compile Include="Symbols\VariableSymbol.cs" />
     <Compile Include="SymbolTable.cs" />
-    <Compile Include="SymbolTableBuilder.cs" />
+    <Compile Include="SemanticAnalyzer.cs" />
     <Compile Include="Token.cs" />
     <Compile Include="Tokenizer.cs" />
     <Compile Include="Tree\AssignmentNode.cs" />
@@ -58,6 +58,7 @@
     <Compile Include="Tree\DeclarationNode.cs" />
     <Compile Include="Tree\NopNode.cs" />
     <Compile Include="Tree\NumberNode.cs" />
+    <Compile Include="Tree\ParameterNode.cs" />
     <Compile Include="Tree\ProcedureNode.cs" />
     <Compile Include="Tree\ProgramNode.cs" />
     <Compile Include="Tree\TreeNode.cs" />

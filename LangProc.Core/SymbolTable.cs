@@ -7,15 +7,20 @@ namespace LangProc.Core
     {
         private readonly Dictionary<string, Symbol> _symbols;
 
-        public SymbolTable()
+        public SymbolTable(string scopeName, int scopeLevel)
         {
+            ScopeName = scopeName;
+            ScopeLevel = scopeLevel;
             _symbols = new Dictionary<string, Symbol>();
 
-            Define(new BuiltInTypeSymbol(TokenType.Integer.ToString()));
-            Define(new BuiltInTypeSymbol(TokenType.Real.ToString()));
+            Insert(new BuiltInTypeSymbol(TokenType.Integer.ToString()));
+            Insert(new BuiltInTypeSymbol(TokenType.Real.ToString()));
         }
 
-        public void Define(Symbol symbol)
+        public string ScopeName { get; }
+        public int ScopeLevel { get; }
+
+        public void Insert(Symbol symbol)
         {
             _symbols[symbol.Name] = symbol;
         }

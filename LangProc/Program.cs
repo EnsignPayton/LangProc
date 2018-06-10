@@ -20,8 +20,8 @@ namespace LangProc
                     tree = parser.Parse();
                 }
 
-                var tableBuilder = new SymbolTableBuilder();
-                tableBuilder.Build(tree);
+                var analyzer = new SemanticAnalyzer();
+                analyzer.Build(tree);
 
                 var interpreter = new Interpreter();
                 interpreter.Interpret(tree);

@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace LangProc.Core.Symbols
+﻿namespace LangProc.Core.Symbols
 {
     public class BuiltInTypeSymbol : Symbol
     {

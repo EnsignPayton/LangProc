@@ -4,13 +4,13 @@ namespace LangProc.Core.Tree
 {
     public class BlockNode : TreeNode<Token>
     {
-        public BlockNode(IEnumerable<DeclarationNode> declarationNodes, CompoundNode compoundNode) : base(null)
+        public BlockNode(IEnumerable<TreeNode<Token>> declarationNodes, CompoundNode compoundNode) : base(null)
         {
             Declarations = declarationNodes;
             CompoundNode = compoundNode;
         }
 
-        public IEnumerable<DeclarationNode> Declarations { get; }
+        public IEnumerable<TreeNode<Token>> Declarations { get; }
         public CompoundNode CompoundNode { get; }
     }
 }

@@ -38,12 +38,18 @@ namespace LangProc.Core
         /// Block               ::= Declarations CompoundStatement
         ///
         /// Declarations        ::= VAR ( Declaration SEMI )+ |
+        ///                         ( PROCEDURE ID ( LPAREN ParameterList RPAREN )? SEMI Block SEMI )* |
         ///                         Empty
         ///
         /// Declaration         ::= ID ( COMMA ID )* COLON Type
         ///
         /// Type                ::= INTEGER |
         ///                         REAL
+        ///
+        /// ParameterList       ::= Parameters |
+        ///                         Parameters SEMI ParameterList
+        ///
+        /// Parameters          ::= ID ( COMMA ID )* COLON Type
         ///
         /// CompoundStatement   ::= BEGIN StatementList END
         ///
@@ -79,6 +85,8 @@ namespace LangProc.Core
             return result;
         }
 
+        #region Parsing Grammar Productions
+
         private ProgramNode ParseProgram()
         {
             Eat(TokenType.Program);
@@ -101,20 +109,48 @@ namespace LangProc.Core
             return new BlockNode(declarations, compound);
         }
 
-        private IEnumerable<DeclarationNode> ParseDeclarations()
+        private IEnumerable<TreeNode<Token>> ParseDeclarations()
         {
-            var results = new List<DeclarationNode>();
+            var results = new List<TreeNode<Token>>();
 
-            if (Current.Type == TokenType.Var)
+            while (true)
             {
-                Eat(TokenType.Var);
-
-                while (Current.Type == TokenType.Id)
+                if (Current.Type == TokenType.Var)
                 {
-                    var declaration = ParseDeclaration();
-                    results.AddRange(declaration);
-                    Eat(TokenType.Semi);
+                    Eat(TokenType.Var);
+
+                    while (Current.Type == TokenType.Id)
+                    {
+                        var declaration = ParseDeclaration();
+                        results.AddRange(declaration);
+                        Eat(TokenType.Semi);
+                    }
                 }
+                else if (Current.Type == TokenType.Procedure)
+                {
+                    Eat(TokenType.Procedure);
+                    var token = Current;
+                    Eat(TokenType.Id);
+
+                    IEnumerable<ParameterNode> parameters;
+
+                    if (Current.Type == TokenType.ParenOpen)
+                    {
+                        Eat(TokenType.ParenOpen);
+                        parameters = ParseParameterList();
+                        Eat(TokenType.ParenClose);
+                    }
+                    else
+                    {
+                        parameters = Enumerable.Empty<ParameterNode>();
+                    }
+
+                    Eat(TokenType.Semi);
+                    var blockNode = ParseBlock();
+                    var procNode = new ProcedureNode(token, parameters, blockNode);
+                    results.Add(procNode);
+                }
+                else break;
             }
 
             return results;
@@ -150,6 +186,42 @@ namespace LangProc.Core
             Eat(TokenType.DeclInteger, TokenType.DeclReal);
 
             return new TypeNode(token);
+        }
+
+        private IEnumerable<ParameterNode> ParseParameterList()
+        {
+            if (Current.Type != TokenType.Id)
+                return Enumerable.Empty<ParameterNode>();
+
+            var paramNodes = ParseParameters().ToList();
+
+            while (Current.Type == TokenType.Semi)
+            {
+                Eat(TokenType.Semi);
+                var moreNodes = ParseParameters().ToList();
+                paramNodes.AddRange(moreNodes);
+            }
+
+            return paramNodes;
+        }
+
+        private IEnumerable<ParameterNode> ParseParameters()
+        {
+            var paramTokens = new List<Token> {Current};
+            Eat(TokenType.Id);
+
+            while (Current.Type == TokenType.Comma)
+            {
+                Eat(TokenType.Comma);
+                paramTokens.Add(Current);
+                Eat(TokenType.Id);
+            }
+
+            Eat(TokenType.Colon);
+            var type = ParseType();
+
+            return paramTokens.Select(p => new VariableNode(p))
+                .Select(v => new ParameterNode(v, type));
         }
 
         private CompoundNode ParseCompoundStatement()
@@ -266,6 +338,8 @@ namespace LangProc.Core
                     return new VariableNode(token);
             }
         }
+
+        #endregion
 
         /// <summary>
         /// Consumes a token of a specific type
