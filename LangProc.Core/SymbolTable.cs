@@ -7,10 +7,11 @@ namespace LangProc.Core
     {
         private readonly Dictionary<string, Symbol> _symbols;
 
-        public SymbolTable(string scopeName, int scopeLevel)
+        public SymbolTable(string scopeName, int scopeLevel, SymbolTable parentScope = null)
         {
             ScopeName = scopeName;
             ScopeLevel = scopeLevel;
+            ParentScope = parentScope;
             _symbols = new Dictionary<string, Symbol>();
 
             Insert(new BuiltInTypeSymbol(TokenType.Integer.ToString()));
@@ -19,6 +20,7 @@ namespace LangProc.Core
 
         public string ScopeName { get; }
         public int ScopeLevel { get; }
+        public SymbolTable ParentScope { get; }
 
         public void Insert(Symbol symbol)
         {
@@ -27,7 +29,7 @@ namespace LangProc.Core
 
         public Symbol Lookup(string name)
         {
-            return _symbols.TryGetValue(name, out var symbol) ? symbol : null;
+            return _symbols.TryGetValue(name, out var symbol) ? symbol : ParentScope?.Lookup(name);
         }
     }
 }

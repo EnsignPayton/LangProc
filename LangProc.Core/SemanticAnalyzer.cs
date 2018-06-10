@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using LangProc.Core.Symbols;
 using LangProc.Core.Tree;
 
@@ -6,7 +7,7 @@ namespace LangProc.Core
 {
     public class SemanticAnalyzer
     {
-        public SymbolTable Scope { get; } = new SymbolTable("GLOBAL", 1);
+        public SymbolTable CurrentScope { get; private set; }
 
         public void Build(TreeNode<Token> tree)
         {
@@ -67,7 +68,12 @@ namespace LangProc.Core
 
         private void Visit(ProgramNode node)
         {
+            var globalScope = new SymbolTable("GLOBAL", 1, CurrentScope);
+            CurrentScope = globalScope;
+
             Visit(node.BlockNode);
+
+            CurrentScope = CurrentScope.ParentScope;
         }
 
         private void Visit(BinaryOperationNode node)
@@ -100,7 +106,7 @@ namespace LangProc.Core
         private void Visit(DeclarationNode node)
         {
             var typeName = node.TypeNode.Data.Type.ToString();
-            var typeSymbol = Scope.Lookup(typeName);
+            var typeSymbol = CurrentScope.Lookup(typeName);
 
             var varName = node.VariableNode.Data.Value.ToString();
             var varSymbol = new VariableSymbol(varName, typeSymbol);
@@ -108,13 +114,13 @@ namespace LangProc.Core
             //if (Scope.Lookup(varName) != null)
             //    throw new InvalidOperationException($"Variable {varName} has already been declared.");
 
-            Scope.Insert(varSymbol);
+            CurrentScope.Insert(varSymbol);
         }
 
         private void Visit(AssignmentNode node)
         {
             var varName = node.Variable.Data.Value.ToString();
-            var varSymbol = Scope.Lookup(varName);
+            var varSymbol = CurrentScope.Lookup(varName);
             if (varSymbol == null)
                 throw new InvalidOperationException($"Variable {varName} was not declared.");
 
@@ -124,13 +130,34 @@ namespace LangProc.Core
         private void Visit(VariableNode node)
         {
             var varName = node.Data.Value.ToString();
-            var varSymbol = Scope.Lookup(varName);
+            var varSymbol = CurrentScope.Lookup(varName);
             if (varSymbol == null)
                 throw new InvalidOperationException($"Variable {varName} was not declared.");
         }
 
         private void Visit(ProcedureNode node)
         {
+            var procName = node.Data.Value.ToString();
+
+            var procParams = new List<VariableSymbol>();
+            foreach (var parameter in node.Parameters)
+            {
+                var paramType = CurrentScope.Lookup(parameter.Type.Data.Type.ToString());
+                var paramName = parameter.Variable.Data.Value.ToString();
+                var varSymbol = new VariableSymbol(paramName, paramType);
+                CurrentScope.Insert(varSymbol);
+                procParams.Add(varSymbol);
+            }
+
+            var procSymbol = new ProcedureSymbol(procName, procParams);
+            CurrentScope.Insert(procSymbol);
+
+            var procScope = new SymbolTable(procName, 2, CurrentScope);
+            CurrentScope = procScope;
+
+            Visit(node.BlockNode);
+
+            CurrentScope = CurrentScope.ParentScope;
         }
 
         #endregion
