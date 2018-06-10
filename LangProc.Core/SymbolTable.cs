@@ -27,9 +27,11 @@ namespace LangProc.Core
             _symbols[symbol.Name] = symbol;
         }
 
-        public Symbol Lookup(string name)
+        public Symbol Lookup(string name, bool currentScopeOnly = false)
         {
-            return _symbols.TryGetValue(name, out var symbol) ? symbol : ParentScope?.Lookup(name);
+            return _symbols.TryGetValue(name, out var symbol)
+                ? symbol : currentScopeOnly ?
+                    null : ParentScope?.Lookup(name);
         }
     }
 }

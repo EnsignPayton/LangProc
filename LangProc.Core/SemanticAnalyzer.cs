@@ -111,8 +111,8 @@ namespace LangProc.Core
             var varName = node.VariableNode.Data.Value.ToString();
             var varSymbol = new VariableSymbol(varName, typeSymbol);
 
-            //if (Scope.Lookup(varName) != null)
-            //    throw new InvalidOperationException($"Variable {varName} has already been declared.");
+            if (CurrentScope.Lookup(varName, true) != null)
+                throw new InvalidOperationException($"Variable {varName} has already been declared.");
 
             CurrentScope.Insert(varSymbol);
         }
