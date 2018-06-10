@@ -15,6 +15,7 @@
         Var,
         DeclInteger,
         DeclReal,
+        Procedure,
         Begin,
         End,
         Dot,

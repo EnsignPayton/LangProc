@@ -58,6 +58,7 @@
     <Compile Include="Tree\DeclarationNode.cs" />
     <Compile Include="Tree\NopNode.cs" />
     <Compile Include="Tree\NumberNode.cs" />
+    <Compile Include="Tree\ProcedureNode.cs" />
     <Compile Include="Tree\ProgramNode.cs" />
     <Compile Include="Tree\TreeNode.cs" />
     <Compile Include="Tree\TypeNode.cs" />

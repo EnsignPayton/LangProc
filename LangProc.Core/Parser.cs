@@ -30,6 +30,46 @@ namespace LangProc.Core
         /// Parses the token sequence into an AST.
         /// </summary>
         /// <returns>Root node of AST</returns>
+        /// <remarks>
+        /// Constructed around the following context free grammar:
+        ///
+        /// Program             ::= PROGRAM Variable SEMI Block DOT
+        ///
+        /// Block               ::= Declarations CompoundStatement
+        ///
+        /// Declarations        ::= VAR ( Declaration SEMI )+ |
+        ///                         Empty
+        ///
+        /// Declaration         ::= ID ( COMMA ID )* COLON Type
+        ///
+        /// Type                ::= INTEGER |
+        ///                         REAL
+        ///
+        /// CompoundStatement   ::= BEGIN StatementList END
+        ///
+        /// StatementList       ::= Statement |
+        ///                         Statement SEMI StatementList
+        ///
+        /// Statement           ::= CompoundStatement |
+        ///                         AssignmentStatement |
+        ///                         Empty
+        ///
+        /// AssignmentStatement ::= Variable ASSIGN Expression
+        ///
+        /// Variable            ::= ID
+        ///
+        /// Expression          ::= Term ( ( PLUS | MINUS ) Term )*
+        ///
+        /// Term                ::= Factor ( ( MULT | INTEGER_DIV | FLOAT_DIV ) Factor )*
+        ///
+        /// Factor              ::= PLUS Factor |
+        ///                         MINUS Factor |
+        ///                         INTEGER |
+        ///                         REAL |
+        ///                         LPAREN Expression RPAREN |
+        ///                         Variable
+        ///
+        /// </remarks>
         public TreeNode<Token> Parse()
         {
             var result =  ParseProgram();

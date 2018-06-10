@@ -22,13 +22,14 @@ namespace LangProc.Core
 
         private static readonly IDictionary<string, TokenType> ReservedWordTypes = new Dictionary<string, TokenType>
         {
-            {"BEGIN", TokenType.Begin},
-            {"END", TokenType.End},
-            {"DIV", TokenType.Div},
             {"PROGRAM", TokenType.Program},
             {"VAR", TokenType.Var},
+            {"DIV", TokenType.Div},
             {"INTEGER", TokenType.DeclInteger},
-            {"REAL", TokenType.DeclReal}
+            {"REAL", TokenType.DeclReal},
+            {"BEGIN", TokenType.Begin},
+            {"END", TokenType.End},
+            {"PROCEDURE", TokenType.Procedure}
         };
 
         /// <summary>
